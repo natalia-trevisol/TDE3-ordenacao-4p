@@ -32,7 +32,7 @@ O sistema mede e compara:
 ---
 
 ## Estrutura do Código
-
+```bash
 tde3-ordenacao
 src/
 │
@@ -44,6 +44,7 @@ src/
 ├── CombSort.java # Implementação do Comb Sort
 ├── BucketSort.java # Implementação do Bucket (Counting) Sort
 └── README.md # Documentação do projeto
+```
 
 ---
 
@@ -71,7 +72,7 @@ src/
 
 3. Executar o programa:
   ```bash
-  java Main
+  java Comparador
   ```
 
 ### Execução via IDE
@@ -249,78 +250,158 @@ Fim da comparacao.
 Process finished with exit code 0
 ```
 
---- 
+---
 
 ## Análise dos Resultados
-### **Vetor 1 (Aleatório):**
-- Todos os algoritmos ordenaram corretamente.
-- SelectionSort fez poucas trocas (18) — esperado, pois troca apenas uma vez por passagem.
-- Bubble, Cocktail e Gnome tiveram muitas trocas (~78), comportamento esperado.
 
-- CombSort e BucketSort foram os mais eficientes em iterações.
-- Melhores: BucketSort e CombSort.
+### **Vetor 1 — Aleatório**
 
-### **Vetor 2 (Crescente):**
-- Vetor já ordenado → algoritmos com “flag” pararam rapidamente.
-- BubbleFlag, Cocktail e Gnome detectaram a ordenação cedo.
-- SelectionSort percorreu tudo (sem otimização).
+Este vetor representa um cenário comum, sem padrão de ordenação prévio. É ideal para avaliar a eficiência média dos algoritmos.
 
-- BucketSort teve trocas artificiais (redistribuição de baldes).
-- Melhores: BubbleFlag, Cocktail e GnomeSort.
+| Algoritmo        | Trocas | Iterações |
+| ---------------- | ------- | ---------- |
+| BubbleSortFlag   | 78      | 190        |
+| SelectionSort    | 18      | 190        |
+| CocktailSort     | 77      | 189        |
+| GnomeSort        | 79      | 199        |
+| CombSort         | 49      | 107        |
+| BucketSort       | 20      | 94         |
 
-### **Vetor 3 (Decrescente):**
-- Pior caso para a maioria dos algoritmos.
-- SelectionSort teve poucas trocas (10), mesmo percorrendo tudo.
-- CombSort e BucketSort mantiveram boa eficiência.
-- Melhores: CombSort e BucketSort.
+**Análise:**
+- Todos os algoritmos **ordenaram corretamente** o vetor.
+- O *SelectionSort* realizou poucas trocas, pois executa **apenas uma troca por passagem completa**.
+- *BubbleSortFlag*, *CocktailSort* e *GnomeSort* executaram **muitas trocas e iterações**, comportamento típico de algoritmos baseados em comparações adjacentes.
+- *CombSort* foi o mais eficiente entre os métodos baseados em comparação, reduzindo o número de iterações através do uso do **gap dinâmico**.
+- *BucketSort* foi o mais rápido em iterações, mas depende fortemente da **distribuição uniforme dos dados**.
 
---- 
+**Melhores:**
+- **BucketSort** – Menor número de iterações.
+- **CombSort** – Equilíbrio entre trocas e desempenho.
 
-## Conclusão Final
-| Situação          | Melhor Algoritmo                  | Justificativa                       |
-| ----------------- | --------------------------------- | ----------------------------------- |
-| Vetor Aleatório   | **BucketSort / CombSort**         | Menos iterações e trocas médias     |
-| Vetor Crescente   | **BubbleFlag / Cocktail / Gnome** | Parada antecipada eficiente         |
-| Vetor Decrescente | **CombSort / BucketSort**         | Boa eficiência mesmo em casos ruins |
+---
 
+### **Vetor 2 — Crescente (já ordenado)**
+
+Esse vetor representa o **melhor caso** para algoritmos com otimização de parada antecipada.
+
+| Algoritmo        | Trocas | Iterações |
+| ---------------- | ------- | ---------- |
+| BubbleSortFlag   | 0       | 19         |
+| SelectionSort    | 0       | 190        |
+| CocktailSort     | 0       | 19         |
+| GnomeSort        | 0       | 21         |
+| CombSort         | 0       | 45         |
+| BucketSort       | 20      | 85         |
+
+**Análise:**
+- Os algoritmos *BubbleSortFlag*, *CocktailSort* e *GnomeSort* **detectaram rapidamente** que o vetor já estava ordenado, parando antes do fim.
+- *SelectionSort* percorreu todas as posições, pois **não possui critério de parada antecipada**, o que o torna ineficiente neste caso.
+- *CombSort* também apresentou bom desempenho, mas ainda realizou algumas passagens desnecessárias.
+- *BucketSort* teve “trocas” artificiais devido à redistribuição dos elementos entre os baldes, mesmo sem necessidade real de ordenação.
+
+**Melhores:**
+- **BubbleSortFlag**
+- **CocktailSort**
+- **GnomeSort**
+
+---
+
+### **Vetor 3 — Decrescente (inverso)**
+
+Cenário de **pior caso** para a maioria dos algoritmos de comparação.
+
+| Algoritmo        | Trocas | Iterações |
+| ---------------- | ------- | ---------- |
+| BubbleSortFlag   | 190     | 190        |
+| SelectionSort    | 10      | 190        |
+| CocktailSort     | 186     | 189        |
+| GnomeSort        | 199     | 199        |
+| CombSort         | 70      | 120        |
+| BucketSort       | 25      | 98         |
+
+**Análise:**
+- *BubbleSortFlag*, *CocktailSort* e *GnomeSort* foram **fortemente penalizados** neste cenário, pois precisaram fazer trocas em quase todas as comparações.
+- *SelectionSort* teve poucas trocas (10), mas manteve o alto número de iterações — uma limitação natural do seu método.
+- *CombSort* manteve **boa eficiência** ao reorganizar elementos mais distantes no início do processo.
+- *BucketSort* continuou competitivo, mesmo com o vetor inversamente ordenado, devido à sua redistribuição eficiente.
+
+**Melhores:**
+- **CombSort**
+- **BucketSort**
+
+---
+
+## Conclusão 
+
+| Situação          | Melhor Algoritmo(s)                     | Justificativa                              |
+| ----------------- | --------------------------------------- | ------------------------------------------ |
+| Vetor Aleatório   | **BucketSort / CombSort**               | Menos iterações e trocas médias            |
+| Vetor Crescente   | **BubbleSortFlag / CocktailSort / GnomeSort** | Parada antecipada eficiente                |
+| Vetor Decrescente | **CombSort / BucketSort**               | Boa eficiência mesmo em casos desfavoráveis |
+
+---
+
+## Rankings Comparativos
+
+### **Menor número de trocas (melhor desempenho em trocas)**
+
+| Posição | Algoritmo        | Média de Trocas |
+| -------- | ---------------- | ---------------- |
+| 1º | **SelectionSort** | 9.3 |
+| 2º | **BucketSort** | 21.6 |
+| 3º | **CombSort** | 39.6 |
+| 4º | **BubbleSortFlag** | 89.3 |
+| 5º | **CocktailSort** | 87.6 |
+| 6º | **GnomeSort** | 92.6 |
+
+### **Menor número de iterações (melhor eficiência de laços)**
+
+| Posição | Algoritmo        | Média de Iterações |
+| -------- | ---------------- | ------------------ |
+| 1º | **BucketSort** | 92.3 |
+| 2º | **CombSort** | 90.6 |
+| 3º | **BubbleSortFlag** | 132.6 |
+| 4º | **CocktailSort** | 132.3 |
+| 5º | **SelectionSort** | 190 |
+| 6º | **GnomeSort** | 139.6 |
+
+---
 
 ## Referências do Estudo
-- Comb Sort
 
-Dobosiewicz, W. (1980). An Efficient Variation of Bubble Sort. PDF – comb_sort.pdf
+### **Comb Sort**
+**Dobosiewicz, W.** (1980). *An Efficient Variation of Bubble Sort.*  
+Disponível em: [comb_sort.pdf](https://example.com/comb_sort.pdf)  
+Explica o conceito de **gap dinâmico** e como o algoritmo melhora o desempenho do *Bubble Sort* reduzindo o número de comparações.
 
-Explica o conceito de "gap" e como o algoritmo melhora o desempenho do Bubble Sort reduzindo o número de comparações.
+---
 
-- Gnome Sort
+### **Gnome Sort**
+**Stalin, H.** (2000). *Gnome Sort – The Simplest Sort Algorithm.*  
+Disponível em: [https://www.geeksforgeeks.org/gnome-sort-a-stupid-one/](https://www.geeksforgeeks.org/gnome-sort-a-stupid-one/)  
+Descreve o algoritmo de forma didática, destacando sua **simplicidade** e funcionamento semelhante ao *Insertion Sort*.
 
-Stalin, H. (2000). Gnome Sort – The Simplest Sort Algorithm.
+---
 
-Disponível em: https://www.geeksforgeeks.org/gnome-sort-a-stupid-one/
+### **Bucket Sort**
+**Baeza-Yates, R.** (1991). *Handbook of Algorithms and Data Structures.*  
+Disponível em: [http://www.dcc.uchile.cl/~rbaeza/handbook/algs/4/423.sort.c.html](http://www.dcc.uchile.cl/~rbaeza/handbook/algs/4/423.sort.c.html)  
+Apresenta a abordagem de **distribuição por intervalos (buckets)** e discute sua eficiência em dados uniformemente distribuídos.
 
-Descreve o algoritmo de forma didática, destacando sua simplicidade e funcionamento semelhante ao Insertion Sort.
+---
 
-- Bucket Sort
+### **Bubble Sort (com flag)**
+**Knuth, D. E.** (1998). *The Art of Computer Programming, Volume 3: Sorting and Searching.* Addison-Wesley.  
+Aborda o algoritmo clássico e variações com otimizações, como o uso de uma **flag de parada antecipada** para evitar passagens desnecessárias.
 
-Baeza-Yates, R. (1991). Handbook of Algorithms and Data Structures.
+---
 
-Disponível em: http://www.dcc.uchile.cl/~rbaeza/handbook/algs/4/423.sort.c.html
+### **Selection Sort**
+**Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C.** (2009). *Introduction to Algorithms* (3ª ed.). MIT Press.  
+Explica o funcionamento do *Selection Sort*, sua complexidade e aplicação em **conjuntos pequenos e estáticos**.
 
-Explica a abordagem de distribuição por intervalos (buckets) e sua eficiência em dados uniformemente distribuídos.
+---
 
-- Bubble Sort (com flag)
-
-Knuth, D. E. (1998). The Art of Computer Programming, Volume 3: Sorting and Searching. Addison-Wesley.
-
-Aborda o algoritmo clássico e variações com otimizações, como o uso de uma flag para evitar passagens desnecessárias.
-
-- Selection Sort
-
-Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C. (2009). Introduction to Algorithms (3rd ed.). MIT Press.
-
-Descreve o funcionamento do Selection Sort, sua complexidade e aplicação em conjuntos pequenos.
-
-- Cocktail Sort (Shaker Sort)
-  
-Weiss, M. A. (2012). Data Structures and Algorithm Analysis in Java (3rd ed.). Pearson.
-
-Apresenta o Cocktail Sort como uma extensão bidirecional do Bubble Sort, reduzindo o número de iterações.
+### **Cocktail Sort (Shaker Sort)**
+**Weiss, M. A.** (2012). *Data Structures and Algorithm Analysis in Java* (3ª ed.). Pearson.  
+Apresenta o *Cocktail Sort* como uma **extensão bidirecional** do *Bubble Sort*, reduzindo o número de iterações através de varreduras em ambos os sentidos.
